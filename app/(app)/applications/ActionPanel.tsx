@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -65,6 +65,19 @@ export function ActionPanel({
   const [showRefer, setShowRefer] = useState(false);
   const [referReason, setReferReason] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setShowReturn(false);
+        setShowRefer(false);
+        setShowObserve(false);
+        setShowDecide(false);
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   const stageOwnerRoles: Record<string, string[]> = {
     SCRUTINY: ["REGIONAL_OFFICER", "ADMIN"],
@@ -348,11 +361,11 @@ export function ActionPanel({
               background: "var(--bg)",
               border: "1px solid var(--border)",
               fontSize: 13,
-              color: "var(--forest-muted)",
+              color: "var(--aiclear-text-secondary)",
             }}
           >
             Currently under review by{" "}
-            <strong style={{ color: "var(--forest)" }}>
+            <strong style={{ color: "var(--aiclear-text-primary)" }}>
               {STAGE_CUSTODIAN[app.currentStageKey] ?? app.currentStageKey}
             </strong>
             . You will be notified if any deficiency response is required.
@@ -366,12 +379,12 @@ export function ActionPanel({
               background: "var(--bg)",
               border: "1px solid var(--border)",
               fontSize: 12.5,
-              color: "var(--forest-muted)",
+              color: "var(--aiclear-text-secondary)",
               marginTop: 4,
             }}
           >
             Stage custodian:{" "}
-            <strong style={{ color: "var(--forest)" }}>
+            <strong style={{ color: "var(--aiclear-text-primary)" }}>
               {STAGE_CUSTODIAN[app.currentStageKey] ?? app.currentStageKey}
             </strong>
             . Stage transition is restricted to the owning authority.
@@ -388,6 +401,8 @@ export function ActionPanel({
           >
             <input
               name="text"
+              id="compliance-reply-input"
+              aria-label="Compliance reply text"
               className="form-input"
               placeholder="Submit compliance reply to resume scrutiny..."
               required
@@ -402,14 +417,21 @@ export function ActionPanel({
 
       {showReturn && (
         <div className="modal-overlay" onClick={() => setShowReturn(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-title">Return Application</div>
-            <p style={{ fontSize: 12.5, color: "var(--forest-muted)", marginBottom: 14 }}>
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="return-modal-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-title" id="return-modal-title">Return Application</div>
+            <p style={{ fontSize: 12.5, color: "var(--aiclear-text-secondary)", marginBottom: 14 }}>
               Specify the deficiency reason (min 10 chars). Opens a 7-day response window for the institution.
             </p>
             <div className="form-group">
-              <label className="form-label">Deficiency Reason *</label>
+              <label htmlFor="return-reason-input" className="form-label">Deficiency Reason *</label>
               <textarea
+                id="return-reason-input"
                 className="form-textarea"
                 value={returnReason}
                 onChange={(e) => setReturnReason(e.target.value)}
@@ -445,14 +467,21 @@ export function ActionPanel({
 
       {showRefer && (
         <div className="modal-overlay" onClick={() => setShowRefer(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-title">Refer to SAC / SHC</div>
-            <p style={{ fontSize: 12.5, color: "var(--forest-muted)", marginBottom: 14 }}>
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="refer-modal-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-title" id="refer-modal-title">Refer to SAC / SHC</div>
+            <p style={{ fontSize: 12.5, color: "var(--aiclear-text-secondary)", marginBottom: 14 }}>
               Routes the application to the Standing Appellate / Hearing Committee and logs the referral in the audit ledger.
             </p>
             <div className="form-group">
-              <label className="form-label">Referral Reason *</label>
+              <label htmlFor="refer-reason-input" className="form-label">Referral Reason *</label>
               <textarea
+                id="refer-reason-input"
                 className="form-textarea"
                 value={referReason}
                 onChange={(e) => setReferReason(e.target.value)}
@@ -478,19 +507,26 @@ export function ActionPanel({
 
       {showObserve && (
         <div className="modal-overlay" onClick={() => setShowObserve(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-title">Add Observation</div>
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="observe-modal-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-title" id="observe-modal-title">Add Observation</div>
             <div className="form-group">
-              <label className="form-label">Category</label>
-              <select className="form-select" value={obsKind} onChange={(e) => setObsKind(e.target.value)}>
+              <label htmlFor="obs-kind-select" className="form-label">Category</label>
+              <select id="obs-kind-select" className="form-select" value={obsKind} onChange={(e) => setObsKind(e.target.value)}>
                 <option value="OBSERVATION">Observation</option>
                 <option value="CLARIFICATION">Clarification</option>
                 <option value="DEFICIENCY">Deficiency</option>
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label">Notes *</label>
+              <label htmlFor="obs-notes-input" className="form-label">Notes *</label>
               <textarea
+                id="obs-notes-input"
                 className="form-textarea"
                 value={obsText}
                 onChange={(e) => setObsText(e.target.value)}
@@ -524,8 +560,14 @@ export function ActionPanel({
 
       {showDecide && (
         <div className="modal-overlay" onClick={() => setShowDecide(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-title">Record Authority Decision</div>
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="decide-modal-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-title" id="decide-modal-title">Record Authority Decision</div>
             <div
               style={{
                 background: "var(--amber-bg)",
@@ -540,8 +582,8 @@ export function ActionPanel({
               Human-in-the-loop requirement: final approval or rejection is recorded by an authorized Bureau Officer and logged to the SHA-256 ledger.
             </div>
             <div className="form-group">
-              <label className="form-label">Decision *</label>
-              <select className="form-select" value={decision} onChange={(e) => setDecision(e.target.value)}>
+              <label htmlFor="decide-choice-select" className="form-label">Decision *</label>
+              <select id="decide-choice-select" className="form-select" value={decision} onChange={(e) => setDecision(e.target.value)}>
                 <option value="">Select decision...</option>
                 <option value="APPROVED">Approved</option>
                 <option value="APPROVED_WITH_CONDITIONS">Approved with Conditions</option>
@@ -551,22 +593,23 @@ export function ActionPanel({
             {decision === "APPROVED_WITH_CONDITIONS" && (
               <div style={{ padding: 12, background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 12, marginBottom: 14 }}>
                 <div className="form-group" style={{ marginBottom: 10 }}>
-                  <label className="form-label">Undertaking Title *</label>
-                  <input className="form-input" value={condTitle} onChange={(e) => setCondTitle(e.target.value)} />
+                  <label htmlFor="cond-title-input" className="form-label">Undertaking Title *</label>
+                  <input id="cond-title-input" className="form-input" value={condTitle} onChange={(e) => setCondTitle(e.target.value)} />
                 </div>
                 <div className="form-group" style={{ marginBottom: 10 }}>
-                  <label className="form-label">Condition Text *</label>
-                  <input className="form-input" value={condText} onChange={(e) => setCondText(e.target.value)} />
+                  <label htmlFor="cond-text-input" className="form-label">Condition Text *</label>
+                  <input id="cond-text-input" className="form-input" value={condText} onChange={(e) => setCondText(e.target.value)} />
                 </div>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Compliance Deadline (Days) *</label>
-                  <input type="number" className="form-input" value={condDays} onChange={(e) => setCondDays(e.target.value)} style={{ maxWidth: 140 }} />
+                  <label htmlFor="cond-days-input" className="form-label">Compliance Deadline (Days) *</label>
+                  <input id="cond-days-input" type="number" className="form-input" value={condDays} onChange={(e) => setCondDays(e.target.value)} style={{ maxWidth: 140 }} />
                 </div>
               </div>
             )}
             <div className="form-group">
-              <label className="form-label">Remarks / Order Justification *</label>
+              <label htmlFor="decide-remarks-input" className="form-label">Remarks / Order Justification *</label>
               <textarea
+                id="decide-remarks-input"
                 className="form-textarea"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}

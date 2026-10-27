@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { differenceInCalendarDays } from "date-fns";
 import { formatStatus } from "@/lib/format";
+import { ShieldCheck } from "lucide-react";
+import { EmptyState } from "@/app/components/shared/EmptyState";
 
 type UndertakingItem = {
   id: string;
@@ -115,6 +117,17 @@ export function UndertakingTable({
     }
   }
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        if (activeUploadId) setActiveUploadId(null);
+        if (activeVerifyId) setActiveVerifyId(null);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeUploadId, activeVerifyId]);
+
   return (
     <div>
       {errorMsg && (
@@ -125,14 +138,23 @@ export function UndertakingTable({
       {/* Upload Evidence Modal */}
       {activeUploadId && (
         <div className="modal-overlay" onClick={() => setActiveUploadId(null)}>
-          <form onSubmit={handleUploadEvidence} className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-title">Upload Undertaking Evidence</div>
-            <p style={{ fontSize: 12.5, color: "var(--forest-muted)", marginBottom: 14 }}>
+          <form
+            onSubmit={handleUploadEvidence}
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="upload-modal-title"
+            aria-describedby="upload-modal-desc"
+          >
+            <div className="modal-title" id="upload-modal-title">Upload Undertaking Evidence</div>
+            <p id="upload-modal-desc" style={{ fontSize: 12.5, color: "var(--aiclear-text-secondary)", marginBottom: 14 }}>
               Attach compliance proof. The undertaking closes once verified by the Regional Officer.
             </p>
             <div className="form-group">
-              <label className="form-label">Attach Compliance Proof (.pdf) *</label>
+              <label htmlFor="compliance-proof-input" className="form-label">Attach Compliance Proof (.pdf) *</label>
               <input
+                id="compliance-proof-input"
                 type="file"
                 accept=".pdf,application/pdf"
                 className="form-input"
@@ -154,14 +176,15 @@ export function UndertakingTable({
                   }
                 }}
               />
-              <small style={{ color: "var(--forest-muted)", fontSize: 12 }}>
+              <small style={{ color: "var(--aiclear-text-secondary)", fontSize: 12 }}>
                 Selected: <strong>{evidenceName || "none"}</strong>
                 {evidenceSize > 0 ? ` · ${evidenceSize.toLocaleString()} bytes` : ""}
               </small>
             </div>
             <div className="form-group">
-              <label className="form-label">Notes</label>
+              <label htmlFor="compliance-note-input" className="form-label">Notes</label>
               <textarea
+                id="compliance-note-input"
                 className="form-textarea"
                 value={evidenceNote}
                 onChange={(e) => setEvidenceNote(e.target.value)}
@@ -184,18 +207,27 @@ export function UndertakingTable({
       {/* Verify / Reject Modal */}
       {activeVerifyId && (
         <div className="modal-overlay" onClick={() => setActiveVerifyId(null)}>
-          <form onSubmit={handleVerify} className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-title">
+          <form
+            onSubmit={handleVerify}
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="verify-modal-title"
+          >
+            <div className="modal-title" id="verify-modal-title">
               {verifyMode === "approve" ? "Verify Undertaking" : "Reject Evidence"}
             </div>
             <div className="form-group">
-              <label className="form-label">Remarks *</label>
+              <label htmlFor="verify-remarks-input" className="form-label">Remarks *</label>
               <textarea
+                id="verify-remarks-input"
                 className="form-textarea"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
                 required
                 rows={3}
+                placeholder="Enter verification notes or reasons for rejection..."
               />
             </div>
             <div className="modal-actions">
@@ -229,7 +261,7 @@ export function UndertakingTable({
       </div>
 
       <div className="card">
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrap">
           <table className="data-table">
             <thead>
               <tr>
@@ -255,8 +287,8 @@ export function UndertakingTable({
                     </td>
                     <td style={{ fontWeight: 700 }}>{ut.institutionName}</td>
                     <td style={{ maxWidth: 290 }}>
-                      <div style={{ fontWeight: 700, color: "var(--forest)" }}>{ut.title}</div>
-                      <div style={{ fontSize: 12, color: "var(--forest-muted)", marginTop: 2 }}>{ut.condition}</div>
+                      <div style={{ fontWeight: 700, color: "var(--aiclear-text-primary)" }}>{ut.title}</div>
+                      <div style={{ fontSize: 12, color: "var(--aiclear-text-secondary)", marginTop: 2 }}>{ut.condition}</div>
                     </td>
                     <td>{new Date(ut.dueDate).toLocaleDateString()}</td>
                     <td>
@@ -277,8 +309,8 @@ export function UndertakingTable({
                           {ut.evidence.fileName}
                         </Link>
                       ) : "—"}
-                      {ut.evidence?.note && <div style={{ marginTop: 4, color: "var(--forest-muted)" }}>{ut.evidence.note}</div>}
-                      {ut.remarks && <div style={{ marginTop: 4, color: "var(--forest-muted)" }}>{ut.remarks}</div>}
+                      {ut.evidence?.note && <div style={{ marginTop: 4, color: "var(--aiclear-text-secondary)" }}>{ut.evidence.note}</div>}
+                      {ut.remarks && <div style={{ marginTop: 4, color: "var(--aiclear-text-secondary)" }}>{ut.remarks}</div>}
                     </td>
                     <td>
                       <div style={{ display: "flex", gap: 6 }}>
@@ -327,7 +359,11 @@ export function UndertakingTable({
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={8}>
-                    <div className="empty-state"><p>No undertakings found.</p></div>
+                    <EmptyState
+                      icon={ShieldCheck}
+                      title="No Undertakings Found"
+                      description="No conditional approval undertakings match the selected status filter."
+                    />
                   </td>
                 </tr>
               )}

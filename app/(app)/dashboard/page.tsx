@@ -7,6 +7,9 @@ import { computeHealthScore } from "@/lib/aph";
 import { formatAppType, formatRoute, formatStage, formatStatus } from "@/lib/format";
 import Link from "next/link";
 import { QuickLinks } from "../QuickLinks";
+import { EmptyState } from "@/app/components/shared/EmptyState";
+import { ComplianceRing } from "@/app/components/dashboard/ComplianceRing";
+import { Inbox, CalendarCheck, ClipboardCheck, Scale, FileText, ArrowRight } from "lucide-react";
 
 function SlaChip({ days, escalationLevel }: { days: number; escalationLevel?: number }) {
   if (escalationLevel && escalationLevel > 0) {
@@ -128,12 +131,12 @@ export default async function DashboardPage() {
       </div>
 
         {regionHealth.length > 0 && (
-          <div className="card" style={{ marginBottom: 18 }}>
+          <div className="card compliance-panel" style={{ marginBottom: 18 }}>
             <div className="card-header">
               <span className="card-title">Institution Compliance Index</span>
-              <span className="badge badge-gray">0–100 Score</span>
+              <span className="badge badge-gray">0–100 Benchmark</span>
             </div>
-            <div className="grid-2" style={{ gap: 10 }}>
+            <div className="grid-2" style={{ gap: 12 }}>
               {regionHealth.map((row) => (
                 <div
                   key={row.id}
@@ -142,15 +145,27 @@ export default async function DashboardPage() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    padding: "10px 14px",
-                    borderRadius: 12,
-                    background: "var(--bg)",
-                    border: "1px solid var(--border)",
+                    padding: "14px 18px",
+                    borderRadius: 14,
                   }}
                 >
-                  <span style={{ fontWeight: 700, fontSize: 13, color: "var(--forest)" }}>{row.name}</span>
-                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <span className="font-mono" style={{ fontWeight: 800, fontSize: 13 }}>{row.health.score}/100</span>
+                  <div style={{ flex: 1, minWidth: 0, marginRight: 16 }}>
+                    <span style={{ fontWeight: 700, fontSize: 13.5, color: "var(--text, #172033)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {row.name}
+                    </span>
+                    <div style={{ width: 140, height: 5, background: "rgba(226, 232, 240, 0.7)", borderRadius: 9999, overflow: "hidden", marginTop: 7 }}>
+                      <div
+                        style={{
+                          width: `${row.health.score}%`,
+                          height: "100%",
+                          background: row.health.label === "HEALTHY" ? "#0D9488" : row.health.label === "AT RISK" ? "#F59E0B" : "#DC2626",
+                          borderRadius: 9999,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 10, alignItems: "center", flexShrink: 0 }}>
+                    <span className="font-mono" style={{ fontWeight: 800, fontSize: 14 }}>{row.health.score}/100</span>
                     <span className={`badge ${row.health.label === "HEALTHY" ? "badge-green" : row.health.label === "AT RISK" ? "badge-amber" : "badge-red"}`}>
                       {row.health.label === "HEALTHY" ? "Healthy" : row.health.label === "AT RISK" ? "At Risk" : "Critical"}
                     </span>
@@ -161,12 +176,12 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        <div className="card">
+        <div className="card worklist-card">
           <div className="card-header">
             <span className="card-title">Regional Worklist</span>
             <Link href="/applications" className="btn btn-secondary btn-sm">View All &rarr;</Link>
           </div>
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-wrap">
             <table className="data-table">
               <thead>
                 <tr>
@@ -209,7 +224,11 @@ export default async function DashboardPage() {
                 {myApps.length === 0 && (
                   <tr>
                     <td colSpan={6}>
-                      <div className="empty-state"><p>No applications assigned in this region.</p></div>
+                      <EmptyState
+                        icon={Inbox}
+                        title="No active applications"
+                        description="There are currently no active applications assigned in this regional worklist."
+                      />
                     </td>
                   </tr>
                 )}
@@ -285,7 +304,7 @@ export default async function DashboardPage() {
               <span className="card-title">Awaiting Competent Authority Decision</span>
               <Link href="/applications?stage=DECISION_PENDING" className="btn btn-secondary btn-sm">View All</Link>
             </div>
-            <div style={{ overflowX: "auto" }}>
+            <div className="table-wrap">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -320,7 +339,7 @@ export default async function DashboardPage() {
 
         <div className="card">
           <div className="card-header"><span className="card-title">Region-wise Pendency</span></div>
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-wrap">
             <table className="data-table">
               <thead>
                 <tr>
@@ -335,7 +354,7 @@ export default async function DashboardPage() {
                 {regions.map((r) => (
                   <tr key={r.id}>
                     <td><strong>{r.name}</strong></td>
-                    <td style={{ color: "var(--forest-muted)" }}>{r.headquarters}</td>
+                    <td style={{ color: "var(--aiclear-text-secondary)" }}>{r.headquarters}</td>
                     <td>{r._count.institutions}</td>
                     <td><span className="badge badge-blue">{appCountMap[r.id] ?? 0} active</span></td>
                     <td>
@@ -403,79 +422,91 @@ export default async function DashboardPage() {
             <span className="card-title">Assigned Scheduled Inspections</span>
             <Link href="/evc" className="btn btn-secondary btn-sm">Open EVC Workspace &rarr;</Link>
           </div>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Application</th>
-                <th>Institution</th>
-                <th>Scheduled Date</th>
-                <th>SLA</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scheduledVisits.map((v) => {
-                const days = v.scheduledFor ? differenceInCalendarDays(v.scheduledFor, now) : 0;
-                return (
-                  <tr key={v.id}>
-                    <td>
-                      <Link href={`/applications/${v.applicationId}`} className="table-link font-mono">
-                        {v.application.refNo}
-                      </Link>
-                    </td>
-                    <td style={{ fontWeight: 600 }}>{v.application.institution.name}</td>
-                    <td>{v.scheduledFor?.toLocaleDateString() ?? "—"}</td>
-                    <td><SlaChip days={days} /></td>
-                    <td>
-                      <Link href={`/evc/${v.id}`} className="btn btn-primary btn-sm">Submit Report</Link>
-                    </td>
-                  </tr>
-                );
-              })}
-              {scheduledVisits.length === 0 && (
-                <tr>
-                  <td colSpan={5}>
-                    <div className="empty-state">
-                      <p>No scheduled visits currently assigned to your committee.</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="card">
-            <div className="card-header">
-              <span className="card-title">Recently Submitted Reports</span>
-            </div>
-            {completedVisits.length > 0 ? <table className="data-table">
+          <div className="table-wrap">
+            <table className="data-table">
               <thead>
                 <tr>
                   <th>Application</th>
                   <th>Institution</th>
-                  <th>Completed On</th>
-                  <th>Report Ref</th>
+                  <th>Scheduled Date</th>
+                  <th>SLA</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {completedVisits.map((v) => (
-                  <tr key={v.id}>
-                    <td>
-                      <Link href={`/applications/${v.applicationId}`} className="table-link font-mono">
-                        {v.application.refNo}
-                      </Link>
+                {scheduledVisits.map((v) => {
+                  const days = v.scheduledFor ? differenceInCalendarDays(v.scheduledFor, now) : 0;
+                  return (
+                    <tr key={v.id}>
+                      <td>
+                        <Link href={`/applications/${v.applicationId}`} className="table-link font-mono">
+                          {v.application.refNo}
+                        </Link>
+                      </td>
+                      <td style={{ fontWeight: 600 }}>{v.application.institution.name}</td>
+                      <td>{v.scheduledFor?.toLocaleDateString() ?? "—"}</td>
+                      <td><SlaChip days={days} /></td>
+                      <td>
+                        <Link href={`/evc/${v.id}`} className="btn btn-primary btn-sm">Submit Report</Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {scheduledVisits.length === 0 && (
+                  <tr>
+                    <td colSpan={5}>
+                      <EmptyState
+                        icon={CalendarCheck}
+                        title="No assigned visits"
+                        description="No scheduled inspections are currently assigned to your committee."
+                      />
                     </td>
-                    <td style={{ fontWeight: 600 }}>{v.application.institution.name}</td>
-                    <td>{v.completedAt?.toLocaleDateString() ?? "—"}</td>
-                    <td><span className="badge badge-green">{v.reportRef ?? "—"}</span></td>
                   </tr>
-                ))}
+                )}
               </tbody>
-            </table> : (
-              <div className="empty-state"><p>No completed EVC reports yet.</p></div>
+            </table>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-header">
+            <span className="card-title">Recently Submitted Reports</span>
+          </div>
+          <div className="table-wrap">
+            {completedVisits.length > 0 ? (
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Application</th>
+                    <th>Institution</th>
+                    <th>Completed On</th>
+                    <th>Report Ref</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {completedVisits.map((v) => (
+                    <tr key={v.id}>
+                      <td>
+                        <Link href={`/applications/${v.applicationId}`} className="table-link font-mono">
+                          {v.application.refNo}
+                        </Link>
+                      </td>
+                      <td style={{ fontWeight: 600 }}>{v.application.institution.name}</td>
+                      <td>{v.completedAt?.toLocaleDateString() ?? "—"}</td>
+                      <td><span className="badge badge-green">{v.reportRef ?? "—"}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <EmptyState
+                icon={ClipboardCheck}
+                title="No completed reports"
+                description="Submitted inspection reports will appear here once finalized."
+              />
             )}
           </div>
+        </div>
       </div>
     );
   }
@@ -523,41 +554,45 @@ export default async function DashboardPage() {
             <span className="card-title">SAC / SHC Hearing Queue</span>
             <span className="badge badge-purple">{sacQueue.length}</span>
           </div>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Ref No</th>
-                <th>Institution</th>
-                <th>Type</th>
-                <th>SLA</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sacQueue.map((a) => {
-                const dl = a.deadlineItems[0];
-                const days = dl ? differenceInCalendarDays(dl.dueAt, now) : 999;
-                return (
-                  <tr key={a.id}>
-                    <td><Link href={`/applications/${a.id}`} className="table-link font-mono">{a.refNo}</Link></td>
-                    <td style={{ fontWeight: 600 }}>{a.institution.name}</td>
-                    <td><span className="badge badge-blue">{formatAppType(a.applicationType)}</span></td>
-                    <td>{days < 900 ? <SlaChip days={days} escalationLevel={dl?.escalationLevel ?? 0} /> : "—"}</td>
-                    <td><Link href={`/applications/${a.id}`} className="btn btn-primary btn-sm">Review &amp; Recommend</Link></td>
-                  </tr>
-                );
-              })}
-              {sacQueue.length === 0 && (
+          <div className="table-wrap">
+            <table className="data-table">
+              <thead>
                 <tr>
-                  <td colSpan={5}>
-                    <div className="empty-state">
-                      <p>No applications currently awaiting SAC / SHC hearing.</p>
-                    </div>
-                  </td>
+                  <th>Ref No</th>
+                  <th>Institution</th>
+                  <th>Type</th>
+                  <th>SLA</th>
+                  <th>Action</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sacQueue.map((a) => {
+                  const dl = a.deadlineItems[0];
+                  const days = dl ? differenceInCalendarDays(dl.dueAt, now) : 999;
+                  return (
+                    <tr key={a.id}>
+                      <td><Link href={`/applications/${a.id}`} className="table-link font-mono">{a.refNo}</Link></td>
+                      <td style={{ fontWeight: 600 }}>{a.institution.name}</td>
+                      <td><span className="badge badge-blue">{formatAppType(a.applicationType)}</span></td>
+                      <td>{days < 900 ? <SlaChip days={days} escalationLevel={dl?.escalationLevel ?? 0} /> : "—"}</td>
+                      <td><Link href={`/applications/${a.id}`} className="btn btn-primary btn-sm">Review &amp; Recommend</Link></td>
+                    </tr>
+                  );
+                })}
+                {sacQueue.length === 0 && (
+                  <tr>
+                    <td colSpan={5}>
+                      <EmptyState
+                        icon={Scale}
+                        title="Docket clear"
+                        description="No applications are currently awaiting SAC / SHC hearing."
+                      />
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     );
@@ -607,38 +642,13 @@ export default async function DashboardPage() {
           <Link href="/applications/new" className="btn btn-primary">+ New Application</Link>
         </div>
 
-        <div className="card" style={{ marginBottom: 18 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-            <div>
-              <div className="card-title">Compliance Index</div>
-              <p style={{ fontSize: 12.5, color: "var(--forest-muted)", marginTop: 2 }}>
-                Weighted from APH norms, document validity, and open undertakings
-              </p>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ fontSize: 34, fontWeight: 900, color: healthColor, fontFamily: "var(--font-mono)", lineHeight: 1 }}>
-                {health.score}<span style={{ fontSize: 15, color: "var(--forest-muted)" }}>/100</span>
-              </div>
-              <span className={`badge ${health.label === "HEALTHY" ? "badge-green" : health.label === "AT RISK" ? "badge-amber" : "badge-red"}`}>
-                {health.label === "HEALTHY" ? "Healthy" : health.label === "AT RISK" ? "At Risk" : "Critical"}
-              </span>
-            </div>
-          </div>
-          <div className="grid-3" style={{ marginTop: 14 }}>
-            <div style={{ padding: "12px 14px", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--forest-muted)", textTransform: "uppercase" }}>APH Norms</div>
-              <div style={{ fontWeight: 800, fontSize: 19, marginTop: 4, fontFamily: "var(--font-mono)" }}>{health.aphScore}/100</div>
-            </div>
-            <div style={{ padding: "12px 14px", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--forest-muted)", textTransform: "uppercase" }}>Documents</div>
-              <div style={{ fontWeight: 800, fontSize: 19, marginTop: 4, fontFamily: "var(--font-mono)" }}>{health.docsScore}/100</div>
-            </div>
-            <div style={{ padding: "12px 14px", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--forest-muted)", textTransform: "uppercase" }}>Undertakings</div>
-              <div style={{ fontWeight: 800, fontSize: 19, marginTop: 4, fontFamily: "var(--font-mono)" }}>{health.undertakingsScore}/100</div>
-            </div>
-          </div>
-        </div>
+        <ComplianceRing
+          score={health.score}
+          label={health.label}
+          aphScore={health.aphScore}
+          docsScore={health.docsScore}
+          undertakingsScore={health.undertakingsScore}
+        />
 
         <div className="kpi-grid">
           <Link href="/applications" className="kpi-card" style={{ textDecoration: "none" }}>
@@ -665,7 +675,7 @@ export default async function DashboardPage() {
             <span className="card-title">Applications</span>
             <Link href="/applications" className="btn btn-secondary btn-sm">View All &rarr;</Link>
           </div>
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-wrap">
             <table className="data-table">
               <thead>
                 <tr>
@@ -698,6 +708,18 @@ export default async function DashboardPage() {
                     </td>
                   </tr>
                 ))}
+                {myApps.length === 0 && (
+                  <tr>
+                    <td colSpan={5}>
+                      <EmptyState
+                        icon={FileText}
+                        title="No applications yet"
+                        description="Submit a new AICTE approval application to begin your compliance workflow."
+                        action={{ label: "+ New Application", href: "/applications/new" }}
+                      />
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -729,7 +751,7 @@ export default async function DashboardPage() {
                   <span className="badge badge-blue">Undertaking</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, fontSize: 13 }}>{ut.title}</div>
-                    <div style={{ fontSize: 12, color: "var(--forest-muted)" }}>
+                    <div style={{ fontSize: 12, color: "var(--aiclear-text-secondary)" }}>
                       Due {ut.dueDate.toLocaleDateString()}
                     </div>
                   </div>
@@ -752,7 +774,7 @@ export default async function DashboardPage() {
                   <span className="badge badge-amber">Document</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, fontSize: 13 }}>{doc.title}</div>
-                    <div style={{ fontSize: 12, color: "var(--forest-muted)" }}>
+                    <div style={{ fontSize: 12, color: "var(--aiclear-text-secondary)" }}>
                       Expires {doc.validUntil.toLocaleDateString()}
                     </div>
                   </div>
@@ -830,8 +852,8 @@ export default async function DashboardPage() {
             ].map(([label, href, sub]) => (
               <Link key={href} href={href} className="quick-link-row">
                 <div>
-                  <div style={{ fontWeight: 700, color: "var(--forest)" }}>{label}</div>
-                  <div style={{ fontSize: 11.5, color: "var(--forest-muted)", fontWeight: 500, marginTop: 1 }}>{sub}</div>
+                  <div style={{ fontWeight: 700, color: "var(--aiclear-text-primary)" }}>{label}</div>
+                  <div style={{ fontSize: 11.5, color: "var(--aiclear-text-secondary)", fontWeight: 500, marginTop: 1 }}>{sub}</div>
                 </div>
                 <span style={{ fontSize: 13, fontWeight: 700 }}>&rarr;</span>
               </Link>
@@ -848,25 +870,25 @@ export default async function DashboardPage() {
           </div>
           <div style={{ display: "grid", gap: 10, fontSize: 13.5 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "var(--bg)", borderRadius: 12, border: "1px solid var(--border)" }}>
-              <span style={{ fontWeight: 600, color: "var(--forest-muted)" }}>System Date</span>
+              <span style={{ fontWeight: 600, color: "var(--aiclear-text-secondary)" }}>System Date</span>
               <span className="font-mono" style={{ fontWeight: 800 }}>
                 {now.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
               </span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "var(--bg)", borderRadius: 12, border: "1px solid var(--border)" }}>
-              <span style={{ fontWeight: 600, color: "var(--forest-muted)" }}>Open Deadlines</span>
+              <span style={{ fontWeight: 600, color: "var(--aiclear-text-secondary)" }}>Open Deadlines</span>
               <span className="badge badge-blue">{openItems}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "var(--bg)", borderRadius: 12, border: "1px solid var(--border)" }}>
-              <span style={{ fontWeight: 600, color: "var(--forest-muted)" }}>Active Escalations</span>
+              <span style={{ fontWeight: 600, color: "var(--aiclear-text-secondary)" }}>Active Escalations</span>
               <span className="badge badge-purple">{escalatedCount}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "var(--bg)", borderRadius: 12, border: "1px solid var(--border)" }}>
-              <span style={{ fontWeight: 600, color: "var(--forest-muted)" }}>Alerts Fired Today</span>
+              <span style={{ fontWeight: 600, color: "var(--aiclear-text-secondary)" }}>Alerts Fired Today</span>
               <span className="badge badge-amber">{alertsToday}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "var(--bg)", borderRadius: 12, border: "1px solid var(--border)" }}>
-              <span style={{ fontWeight: 600, color: "var(--forest-muted)" }}>Audit Chain</span>
+              <span style={{ fontWeight: 600, color: "var(--aiclear-text-secondary)" }}>Audit Chain</span>
               <Link href="/audit" className="badge badge-green" style={{ textDecoration: "none" }}>
                 SHA-256 Verified &rarr;
               </Link>

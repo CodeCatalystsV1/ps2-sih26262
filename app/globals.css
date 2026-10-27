@@ -7,12 +7,25 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid #2563eb;
+  outline: 2.5px solid var(--aiclear-indigo);
   outline-offset: 2px;
 }
 
+/* Responsive Table Wrapper with subtle scroll cues */
 .table-wrap {
+  width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  border-radius: 12px;
+  background:
+    linear-gradient(to right, #FFFFFF 30%, rgba(255, 255, 255, 0)),
+    linear-gradient(to right, rgba(255, 255, 255, 0), #FFFFFF 70%) 100% 0,
+    radial-gradient(farthest-side at 0 50%, rgba(15, 23, 42, 0.12), rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(15, 23, 42, 0.12), rgba(0, 0, 0, 0)) 100% 0;
+  background-repeat: no-repeat;
+  background-size: 32px 100%, 32px 100%, 12px 100%, 12px 100%;
+  background-attachment: local, local, scroll, scroll;
 }
 
 :root {
@@ -21,48 +34,56 @@ textarea:focus-visible {
   --font-mono: 'JetBrains Mono', monospace;
 
   /* AIClear Design System Core Tokens */
-  --bg: #F1F5F9;                 /* Soft Slate content canvas */
-  --bg-subtle: #E2E8F0;          /* Subtle Slate divider */
-  --card-bg: #FFFFFF;            /* Crisp Pure White card */
-  --card-hover: #F8FAFC;         /* Hover state */
+  --aiclear-navy: #0B1220;
+  --aiclear-indigo: #315FE8;
+  --aiclear-indigo-hover: #274DC5;
+  --aiclear-indigo-light: #EEF2FF;
+  --aiclear-indigo-glow: rgba(49, 95, 232, 0.22);
+  --aiclear-teal: #0D9488;
+  --aiclear-teal-light: #F0FDFA;
+  --aiclear-slate: #F1F5F9;
+  --aiclear-slate-subtle: #F8FAFC;
+  --aiclear-text-primary: #0F172A;
+  --aiclear-text-secondary: #64748B;
+  --aiclear-border: #D8E0EC;
+  --aiclear-border-light: #E2E8F0;
+  --aiclear-white: #FFFFFF;
 
-  --forest: #0F172A;             /* Primary text & deep navy accents */
-  --forest-soft: #1E293B;        /* Secondary dark slate */
-  --forest-muted: #64748B;       /* Secondary description & metadata */
-  --forest-light: #94A3B8;       /* Subtle text & placeholders */
+  /* Standardized Global Theme Bindings */
+  --bg: var(--aiclear-slate);                    /* Soft Slate content canvas #F1F5F9 */
+  --bg-subtle: var(--aiclear-border-light);      /* Divider Slate #E2E8F0 */
+  --card-bg: var(--aiclear-white);               /* Pure White card #FFFFFF */
+  --card-hover: var(--aiclear-slate-subtle);     /* Hover state #F8FAFC */
 
-  --text: #0F172A;               /* Dark Slate */
-  --text-muted: #64748B;         /* Slate 500 */
-  --muted: #64748B;
+  --text: var(--aiclear-text-primary);           /* Primary Text #0F172A */
+  --text-muted: var(--aiclear-text-secondary);   /* Secondary Text #64748B */
+  --muted: var(--aiclear-text-secondary);
 
-  --primary: #315FE8;            /* Electric Indigo */
-  --primary-light: #EEF2FF;      /* Indigo Light tint */
-  --primary-dark: #1E3A8A;       /* Indigo Dark */
+  --primary: var(--aiclear-indigo);              /* Electric Indigo #315FE8 */
+  --primary-light: var(--aiclear-indigo-light);  /* Indigo Light tint #EEF2FF */
+  --primary-dark: #1E3A8A;                       /* Indigo Dark */
 
-  --accent-blue: #315FE8;        /* Electric Indigo */
-  --accent-blue-hover: #274DC5;
+  --accent-blue: var(--aiclear-indigo);          /* Electric Indigo #315FE8 */
+  --accent-blue-hover: var(--aiclear-indigo-hover);
   --accent-blue-text: #FFFFFF;
 
-  --accent-sage: #CCFBF1;        /* Compliance Teal Light */
-  --accent-peach: #FEF3C7;       /* Amber Light */
-  --accent-lavender: #EEF2FF;    /* Indigo Light */
+  --accent-sage: #CCFBF1;                        /* Compliance Teal Light */
+  --accent-peach: #FEF3C7;                       /* Amber Light */
+  --accent-lavender: var(--aiclear-indigo-light);/* Indigo Light */
 
-  --highlighter-yellow: #EEF2FF; /* Clean Indigo tint pill */
-  --highlighter-yellow-soft: #F8FAFC;
-
-  --sidebar-bg: #0B1220;         /* Midnight Navy Sidebar */
-  --sidebar-border: #1E293B;     /* Deep Navy border */
-  --sidebar-text: #94A3B8;       /* Muted Slate text */
-  --sidebar-hover: #1E293B;      /* Hover item */
-  --sidebar-active: #315FE8;     /* Electric Indigo active item */
+  --sidebar-bg: var(--aiclear-navy);             /* Midnight Navy #0B1220 */
+  --sidebar-border: #1E293B;                     /* Deep Navy border */
+  --sidebar-text: #94A3B8;                       /* Muted Slate text */
+  --sidebar-hover: #1E293B;                      /* Hover item */
+  --sidebar-active: var(--aiclear-indigo);       /* Electric Indigo #315FE8 */
   --sidebar-active-text: #FFFFFF;
 
-  --border: #D8E0EC;             /* Refined Slate border */
-  --border-strong: #0B1220;
+  --border: var(--aiclear-border);               /* Refined Slate border #D8E0EC */
+  --border-strong: var(--aiclear-navy);
 
   /* Semantic status colors tuned to AIClear palette */
-  --green: #0D9488;              /* Compliance Teal */
-  --green-bg: #F0FDFA;
+  --green: var(--aiclear-teal);                  /* Compliance Teal #0D9488 */
+  --green-bg: var(--aiclear-teal-light);
   --green-border: #99F6E4;
 
   --amber: #B45309;
@@ -81,21 +102,13 @@ textarea:focus-visible {
   --gray-bg: #F1F5F9;
   --gray-border: #CBD5E1;
 
-  /* AIClear Design System Tokens */
-  --aiclear-navy: #0B1220;
-  --aiclear-indigo: #315FE8;
-  --aiclear-indigo-hover: #274DC5;
-  --aiclear-indigo-light: #EEF2FF;
-  --aiclear-indigo-glow: rgba(49, 95, 232, 0.22);
-  --aiclear-teal: #0D9488;
-  --aiclear-teal-light: #F0FDFA;
-  --aiclear-slate: #F1F5F9;
-  --aiclear-slate-subtle: #F8FAFC;
-  --aiclear-text-primary: #0F172A;
-  --aiclear-text-secondary: #64748B;
-  --aiclear-border: #D8E0EC;
-  --aiclear-border-light: #E2E8F0;
-  --aiclear-white: #FFFFFF;
+  /* Standardized Backward-Compatible Aliases */
+  --forest: var(--aiclear-text-primary);
+  --forest-soft: #1E293B;
+  --forest-muted: var(--aiclear-text-secondary);
+  --forest-light: #94A3B8;
+  --highlighter-yellow: var(--aiclear-indigo-light);
+  --highlighter-yellow-soft: var(--aiclear-slate-subtle);
 }
 
 * {
@@ -959,23 +972,92 @@ a.card:hover {
 
 /* Empty State */
 .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 48px 20px;
-  color: var(--forest-muted);
+  padding: 40px 20px;
+  color: var(--aiclear-text-secondary);
 }
 
+.empty-state-compact {
+  padding: 24px 16px;
+}
+
+.empty-state-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--aiclear-indigo-light);
+  color: var(--aiclear-indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.empty-state-compact .empty-state-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.empty-state-title,
 .empty-state h3 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  color: var(--forest);
-  margin-bottom: 6px;
+  color: var(--aiclear-text-primary);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
 }
 
+.empty-state-desc,
 .empty-state p {
   font-size: 13px;
-  color: var(--forest-muted);
+  color: var(--aiclear-text-secondary);
   max-width: 400px;
+  line-height: 1.5;
   margin: 0 auto;
+}
+
+.empty-state-action {
+  margin-top: 14px;
+}
+
+/* Chart Container & Skeletons */
+.chart-card {
+  min-height: 280px;
+}
+
+.chart-skeleton-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 20px 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.chart-skeleton-bar {
+  flex: 1;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #E2E8F0 0%, #F1F5F9 100%);
+  animation: chartPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes chartPulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-skeleton-bar {
+    animation: none;
+    opacity: 0.7;
+  }
 }
 /* Safeguards Footer Banner */
 .safeguards-banner {
@@ -1180,6 +1262,522 @@ a.card:hover {
   .topbar { left: 0; padding: 0 16px; gap: 10px; }
   .role-accent-stripe { left: 0; }
   .user-switcher { display: none; }
+}
+
+/* ============================================================
+   AIClear Authenticated Portal — Orange & White Theme & Floating System
+   ============================================================ */
+
+.app-shell {
+  /* Core Orange & White Palette Tokens */
+  --primary: #EA580C;                  /* Primary Orange */
+  --primary-hover: #C2410C;            /* Dark Orange */
+  --primary-dark: #C2410C;
+  --primary-light: #FFF7ED;            /* Orange 50 tint */
+  --primary-glow: rgba(234, 88, 12, 0.25);
+  --accent-orange: #EA580C;
+  --accent-amber: #F59E0B;             /* Amber accent */
+  --accent-amber-light: #FEF3C7;
+
+  /* Surfaces & Typography with Premium Glassmorphic Translucency */
+  --bg: #F8FAFC;                       /* Main Background: Slate-50 */
+  --bg-subtle: #F1F5F9;
+  --card-bg: rgba(255, 255, 255, 0.72); /* Premium Translucent White Glass (72%) */
+  --card-hover: rgba(255, 255, 255, 0.86);
+  --text: #172033;                     /* Primary Text: Deep Slate */
+  --text-muted: #64748B;               /* Secondary Text: Muted Slate */
+  --border: rgba(226, 232, 240, 0.75); /* Subtle Semi-translucent Glass Border */
+  --border-subtle: #F1F5F9;
+
+  /* Preserved Dark Navy Sidebar with Orange Accents */
+  --sidebar-bg: #0B1220;
+  --sidebar-border: #1E293B;
+  --sidebar-text: #94A3B8;
+  --sidebar-hover: #1E293B;
+  --sidebar-active: #EA580C;
+  --sidebar-active-text: #FFFFFF;
+
+  /* Status Colors */
+  --green: #0D9488;
+  --green-bg: #F0FDFA;
+  --green-border: #99F6E4;
+
+  --amber: #B45309;
+  --amber-bg: #FEF3C7;
+  --amber-border: #FDE68A;
+
+  --red: #DC2626;
+  --red-bg: #FEF2F2;
+  --red-border: #FECACA;
+
+  --purple: #7C3AED;
+  --purple-bg: #F5F3FF;
+  --purple-border: #DDD6FE;
+
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  position: relative;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   Decorative AICTE Logo Background Watermark (Authenticated Only)
+   ============================================================ */
+.app-shell .aicte-watermark {
+  position: fixed;
+  top: 62px;
+  right: 0;
+  bottom: 0;
+  left: 248px;
+  background-image: url('/logo.png');
+  background-repeat: no-repeat;
+  background-position: calc(100% - 50px) 50%;
+  background-size: min(560px, 44vw);
+  opacity: 0.11; /* 11% opacity: visibly and elegantly shines through rgba(255, 255, 255, 0.72) glass while keeping text high-contrast */
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
+  overflow: hidden;
+  transition: opacity 300ms ease;
+}
+
+@media (max-width: 900px) {
+  .app-shell .aicte-watermark {
+    left: 0;
+    background-position: center 50%;
+    background-size: min(380px, 75vw);
+    opacity: 0.09;
+  }
+}
+
+/* Content Container above watermark */
+.app-shell .main {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+/* Glassmorphic Header Bar */
+.app-shell .topbar {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04);
+}
+
+/* Dashboard Entrance Animation */
+@keyframes dashboardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-shell .page-header {
+  animation: dashboardEntrance 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.app-shell .kpi-grid {
+  animation: dashboardEntrance 400ms cubic-bezier(0.16, 1, 0.3, 1) 40ms both;
+}
+
+.app-shell .card {
+  animation: dashboardEntrance 440ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both;
+}
+
+/* Staggered KPI Card Entrances */
+.app-shell .kpi-card {
+  animation: dashboardEntrance 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.app-shell .kpi-card:nth-child(1) { animation-delay: 40ms; }
+.app-shell .kpi-card:nth-child(2) { animation-delay: 80ms; }
+.app-shell .kpi-card:nth-child(3) { animation-delay: 120ms; }
+.app-shell .kpi-card:nth-child(4) { animation-delay: 160ms; }
+.app-shell .kpi-card:nth-child(5) { animation-delay: 200ms; }
+.app-shell .kpi-card:nth-child(6) { animation-delay: 240ms; }
+.app-shell .kpi-card:nth-child(7) { animation-delay: 280ms; }
+.app-shell .kpi-card:nth-child(8) { animation-delay: 320ms; }
+
+/* ============================================================
+   Premium Glassmorphic Floating Card Effects
+   ============================================================ */
+
+/* Base Glassmorphic Card Resting State (0.72 Translucency + Blur 14px) */
+.app-shell .card,
+.app-shell .kpi-card,
+.app-shell .stat-card,
+.app-shell .summary-card,
+.app-shell .chart-card,
+.app-shell .filter-bar,
+.app-shell .compliance-card,
+.app-shell .safeguards-banner,
+.app-shell .worklist-card {
+  background: #FFFFFF; /* Fallback for browsers without backdrop-filter support */
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.05),
+              0 2px 6px -1px rgba(15, 23, 42, 0.02),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 250ms ease,
+              background-color 250ms ease;
+  will-change: transform, box-shadow;
+}
+
+/* Fallback for browsers lacking backdrop-filter */
+@supports not ((-webkit-backdrop-filter: blur(14px)) or (backdrop-filter: blur(14px))) {
+  .app-shell .card,
+  .app-shell .kpi-card,
+  .app-shell .stat-card,
+  .app-shell .summary-card,
+  .app-shell .chart-card,
+  .app-shell .filter-bar,
+  .app-shell .compliance-card,
+  .app-shell .safeguards-banner,
+  .app-shell .worklist-card,
+  .app-shell .table-wrap {
+    background: #FFFFFF;
+  }
+}
+
+/* Glassmorphism Floating Card Hover State - Gentle Rise & Warm Amber/Orange Elevation */
+.app-shell .card:hover,
+.app-shell .kpi-card:hover,
+.app-shell .stat-card:hover,
+.app-shell .summary-card:hover,
+.app-shell .chart-card:hover,
+.app-shell .compliance-card:hover,
+.app-shell .worklist-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 20px 40px -4px rgba(234, 88, 12, 0.14),
+              0 8px 18px -2px rgba(15, 23, 42, 0.06),
+              0 0 0 1px rgba(234, 88, 12, 0.22),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+  border-color: rgba(234, 88, 12, 0.40);
+}
+
+/* Top accent stripe on KPI cards with orange default */
+.app-shell .kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  background: var(--primary);
+  transition: height 200ms ease;
+}
+
+.app-shell .kpi-card:hover::before {
+  height: 4.5px;
+}
+
+.app-shell .kpi-card.red::before { background: var(--red); }
+.app-shell .kpi-card.amber::before { background: #D97706; }
+.app-shell .kpi-card.green::before { background: var(--green); }
+.app-shell .kpi-card.purple::before { background: var(--purple); }
+
+.app-shell .kpi-value {
+  color: var(--text);
+}
+
+.app-shell .card-title {
+  color: var(--text);
+}
+
+/* ============================================================
+   Buttons, Tabs, Navigation & Interactive States
+   ============================================================ */
+
+/* Primary Orange Button */
+.app-shell .btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-shell .btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.42);
+}
+
+.app-shell .btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.25);
+}
+
+/* Secondary Button with Glass Rest & Warm Hover */
+.app-shell .btn-secondary {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 180ms ease;
+}
+
+.app-shell .btn-secondary:hover {
+  background: rgba(255, 247, 237, 0.90);
+  border-color: #FDBA74;
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* Highlight Button */
+.app-shell .btn-highlight {
+  background: rgba(255, 247, 237, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--primary);
+  border-color: #FDBA74;
+}
+
+.app-shell .btn-highlight:hover {
+  background: #FFEDD5;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* Sidebar Navigation Items */
+.app-shell .nav-item {
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-shell .nav-item:hover {
+  background: rgba(234, 88, 12, 0.12);
+  color: #FFFFFF;
+  transform: translateX(3px);
+}
+
+.app-shell .nav-item.active {
+  background: #EA580C;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 3px 14px rgba(234, 88, 12, 0.42);
+}
+
+.app-shell .nav-item.active:hover {
+  background: #C2410C;
+  transform: none;
+}
+
+/* Applications Table Interactive Rows & Glass Container */
+.app-shell .table-wrap {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+}
+
+.app-shell .data-table th {
+  background: rgba(248, 250, 252, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #0F172A;
+  border-bottom: 2px solid rgba(226, 232, 240, 0.85);
+}
+
+.app-shell .data-table tr {
+  transition: background-color 160ms ease;
+}
+
+.app-shell .data-table tr:hover td {
+  background-color: rgba(255, 251, 247, 0.80);
+}
+
+.app-shell .table-link {
+  color: var(--primary);
+  text-decoration-color: rgba(234, 88, 12, 0.5);
+  transition: all 160ms ease;
+}
+
+.app-shell .table-link:hover {
+  color: var(--primary-hover);
+  background: #FFF7ED;
+  border-radius: 4px;
+}
+
+/* Tabs */
+.app-shell .tab {
+  transition: all 180ms ease;
+}
+
+.app-shell .tab:hover {
+  color: var(--primary);
+  background: rgba(234, 88, 12, 0.06);
+}
+
+.app-shell .tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 700;
+}
+
+/* Quick link rows */
+.app-shell .quick-link-row:hover {
+  background: #FFF7ED;
+  border-color: var(--primary);
+  transform: translateX(3px);
+}
+
+/* Topbar Notification & Switcher Focus */
+.app-shell .notif-bell:hover {
+  background: #FFF7ED;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.app-shell .notif-count {
+  background: var(--primary);
+}
+
+.app-shell .user-switcher select:hover,
+.app-shell .user-switcher select:focus {
+  border-color: var(--primary);
+}
+
+.app-shell .clock-badge:hover {
+  background: #FFF7ED;
+  border-color: var(--primary);
+}
+
+/* Focus States for Keyboard Accessibility */
+.app-shell button:focus-visible,
+.app-shell a:focus-visible,
+.app-shell input:focus-visible,
+.app-shell select:focus-visible,
+.app-shell textarea:focus-visible {
+  outline: 2.5px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.app-shell .form-input:focus,
+.app-shell .form-select:focus,
+.app-shell .form-textarea:focus,
+.app-shell .input-text:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.16);
+}
+
+/* Dialog & Dropdown Smooth Scale Transitions */
+@keyframes modalScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.app-shell .modal {
+  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: modalScaleIn 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 24px 50px -10px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(234, 88, 12, 0.12);
+}
+
+.app-shell .stage-dot.current {
+
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.28);
+}
+
+.app-shell .stage-dot.done {
+  background: #0D9488;
+  border-color: #0D9488;
+  color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25);
+}
+
+.app-shell .stage-line.done {
+  background: #0D9488;
+}
+
+.app-shell .btn-success {
+  background: #F0FDFA;
+  color: #0D9488;
+  border-color: #99F6E4;
+  font-weight: 700;
+  transition: all 180ms ease;
+}
+
+.app-shell .btn-success:hover {
+  background: #CCFBF1;
+  border-color: #0D9488;
+  color: #0F766E;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(13, 148, 136, 0.2);
+}
+
+.app-shell .badge-teal,
+.app-shell .badge-green {
+  background: #F0FDFA;
+  color: #0D9488;
+  border-color: #99F6E4;
+}
+
+.app-shell .badge-navy {
+  background: #0B1220;
+  color: #F8FAFC;
+  border-color: #1E293B;
+}
+
+.app-shell .sla-chip.green {
+  background: #F0FDFA;
+  color: #0D9488;
+  border-color: #99F6E4;
+}
+
+
+/* Reduced-Motion Accessibility Safeguard */
+@media (prefers-reduced-motion: reduce) {
+  .app-shell .page-header,
+  .app-shell .kpi-grid,
+  .app-shell .card,
+  .app-shell .kpi-card,
+  .app-shell .modal {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .app-shell .card:hover,
+  .app-shell .kpi-card:hover,
+  .app-shell .stat-card:hover,
+  .app-shell .summary-card:hover,
+  .app-shell .chart-card:hover,
+  .app-shell .compliance-card:hover,
+  .app-shell .btn-primary:hover,
+  .app-shell .btn-secondary:hover,
+  .app-shell .quick-link-row:hover,
+  .app-shell .nav-item:hover {
+    transform: none !important;
+  }
 }
 
 /* ============================================================
@@ -1391,6 +1989,25 @@ a.card:hover {
   flex-direction: column;
   gap: 12px;
   width: 100%;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .login-brand-column {
+    padding: 28px 32px;
+  }
+  .brand-body {
+    padding: 16px 0;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .brand-features-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .brand-feature-card {
+    padding: 11px 12px;
+  }
 }
 
 .brand-feature-card {

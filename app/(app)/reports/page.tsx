@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { STAGES } from "@/config/rules";
 import { formatStage, formatStatus } from "@/lib/format";
+import { EmptyState } from "@/app/components/shared/EmptyState";
+import { BarChart3, Users, ShieldCheck, FileSpreadsheet, ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -89,7 +91,7 @@ export default async function ReportsPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Reports</h1>
-          <p className="page-subtitle">Operational summaries and CSV exports</p>
+          <p className="page-subtitle">Operational summaries and regulatory CSV exports</p>
         </div>
       </div>
 
@@ -127,9 +129,9 @@ export default async function ReportsPage() {
                 style={{
                   fontSize: 13,
                   fontWeight: 800,
-                  background: "var(--highlighter-yellow)",
-                  color: "var(--forest)",
-                  border: "1.5px solid var(--forest)",
+                  background: "rgba(234, 88, 12, 0.08)",
+                  color: "#EA580C",
+                  border: "1.5px solid rgba(234, 88, 12, 0.22)",
                   padding: "5px 9px",
                   borderRadius: 10,
                   flexShrink: 0,
@@ -139,12 +141,13 @@ export default async function ReportsPage() {
               </span>
               <div style={{ flex: 1 }}>
                 <div className="card-title">{r.title}</div>
-                <p style={{ fontSize: 12.5, color: "var(--forest-muted)", marginTop: 3 }}>{r.desc}</p>
+                <p style={{ fontSize: 12.5, color: "var(--aiclear-text-secondary)", marginTop: 3 }}>{r.desc}</p>
               </div>
             </div>
             <div style={{ marginTop: 14, display: "flex", justifyContent: "flex-end" }}>
-              <a href={r.exportUrl} className="btn btn-secondary btn-sm">
-                Export CSV &rarr;
+              <a href={r.exportUrl} className="btn btn-secondary btn-sm" aria-label={`Export CSV for ${r.title}`}>
+                <span>Export CSV</span>
+                <ArrowRight className="w-3.5 h-3.5 inline ml-1.5" aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -157,86 +160,116 @@ export default async function ReportsPage() {
           <span className="card-title">Applications by Stage</span>
           <span className="badge badge-gray">{totalApps} total</span>
         </div>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Stage</th>
-              <th>Count</th>
-              <th>Share</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stageBreakdown.map((s) => {
-              const pct = totalApps > 0 ? Math.round((s._count.id / totalApps) * 100) : 0;
-              return (
-                <tr key={s.currentStageKey}>
-                  <td style={{ fontWeight: 700 }}>
-                    {STAGES[s.currentStageKey]?.label ?? formatStage(s.currentStageKey)}
-                  </td>
-                  <td><strong>{s._count.id}</strong></td>
-                  <td>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ flex: 1, height: 10, background: "var(--bg-subtle)", borderRadius: 9999, overflow: "hidden", border: "1px solid var(--border)" }}>
-                        <div style={{ width: `${pct}%`, height: "100%", background: "var(--forest)", borderRadius: 9999 }} />
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Count</th>
+                <th>Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stageBreakdown.map((s) => {
+                const pct = totalApps > 0 ? Math.round((s._count.id / totalApps) * 100) : 0;
+                return (
+                  <tr key={s.currentStageKey}>
+                    <td style={{ fontWeight: 700 }}>
+                      {STAGES[s.currentStageKey]?.label ?? formatStage(s.currentStageKey)}
+                    </td>
+                    <td><strong>{s._count.id}</strong></td>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ flex: 1, height: 10, background: "var(--bg-subtle)", borderRadius: 9999, overflow: "hidden", border: "1px solid var(--border)" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", background: "#EA580C", borderRadius: 9999 }} />
+                        </div>
+                        <span className="font-mono" style={{ fontSize: 12, fontWeight: 700, width: 44 }}>{pct}%</span>
                       </div>
-                      <span className="font-mono" style={{ fontSize: 12, fontWeight: 700, width: 44 }}>{pct}%</span>
-                    </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {stageBreakdown.length === 0 && (
+                <tr>
+                  <td colSpan={3}>
+                    <EmptyState
+                      icon={BarChart3}
+                      title="No application data"
+                      description="There are currently no applications recorded for this region or filter."
+                    />
                   </td>
                 </tr>
-              );
-            })}
-            {stageBreakdown.length === 0 && (
-              <tr><td colSpan={3}><div className="empty-state"><p>No application data available.</p></div></td></tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* EVC & Undertaking stats */}
       <div className="grid-2">
         <div className="card">
           <div className="card-header"><span className="card-title">EVC Status</span></div>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              {evcStats.map((e) => (
-                <tr key={e.status}>
-                  <td><span className="badge badge-blue">{formatStatus(e.status)}</span></td>
-                  <td><strong>{e._count.id}</strong></td>
+          <div className="table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Count</th>
                 </tr>
-              ))}
-              {evcStats.length === 0 && (
-                <tr><td colSpan={2}><div className="empty-state"><p>No EVC records available.</p></div></td></tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {evcStats.map((e) => (
+                  <tr key={e.status}>
+                    <td><span className="badge badge-blue">{formatStatus(e.status)}</span></td>
+                    <td><strong>{e._count.id}</strong></td>
+                  </tr>
+                ))}
+                {evcStats.length === 0 && (
+                  <tr>
+                    <td colSpan={2}>
+                      <EmptyState
+                        icon={Users}
+                        title="No EVC visits"
+                        description="No Expert Visit Committee records found for this scope."
+                      />
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
         <div className="card">
           <div className="card-header"><span className="card-title">Undertakings</span></div>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              {undertakingStats.map((u) => (
-                <tr key={u.status}>
-                  <td><span className="badge badge-amber">{formatStatus(u.status)}</span></td>
-                  <td><strong>{u._count.id}</strong></td>
+          <div className="table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Count</th>
                 </tr>
-              ))}
-              {undertakingStats.length === 0 && (
-                <tr><td colSpan={2}><div className="empty-state"><p>No undertaking records available.</p></div></td></tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {undertakingStats.map((u) => (
+                  <tr key={u.status}>
+                    <td><span className="badge badge-amber">{formatStatus(u.status)}</span></td>
+                    <td><strong>{u._count.id}</strong></td>
+                  </tr>
+                ))}
+                {undertakingStats.length === 0 && (
+                  <tr>
+                    <td colSpan={2}>
+                      <EmptyState
+                        icon={ShieldCheck}
+                        title="No undertakings"
+                        description="No conditional undertakings recorded for this scope."
+                      />
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

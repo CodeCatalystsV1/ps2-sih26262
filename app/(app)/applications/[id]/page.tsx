@@ -89,29 +89,119 @@ function RouteStepper({
 function DualClockBar({ officerDays, institutionDays }: { officerDays: number; institutionDays: number }) {
   const total = Math.max(1, officerDays + institutionDays);
   const officerPct = Math.round((officerDays / total) * 100);
+  const instPct = 100 - officerPct;
+
   return (
     <div className="card" style={{ marginBottom: 16 }}>
-      <div className="card-header" style={{ marginBottom: 8 }}>
-        <span className="card-title">Processing Time Split (Dual-Clock)</span>
-        <span className="badge badge-gray">Total {officerDays + institutionDays}d</span>
+      <div className="card-header" style={{ marginBottom: 12 }}>
+        <div>
+          <span className="card-title">Processing Time Split (Dual-Clock)</span>
+          <p style={{ fontSize: 12, color: "var(--aiclear-text-secondary)", marginTop: 2 }}>
+            Separates council review time from institution deficiency response time
+          </p>
+        </div>
+        <span className="badge badge-gray font-mono">
+          Total {officerDays + institutionDays}d
+        </span>
       </div>
-      <div style={{ display: "flex", height: 16, borderRadius: 9999, overflow: "hidden", background: "var(--bg-subtle)", border: "1px solid var(--border)" }}>
+
+      {/* Accessible progress meter */}
+      <div
+        role="group"
+        aria-label="Processing time distribution: Council Review vs Institution Response"
+        style={{
+          display: "flex",
+          height: 18,
+          borderRadius: 9999,
+          overflow: "hidden",
+          background: "var(--bg-subtle)",
+          border: "1px solid var(--border)",
+          padding: 2,
+        }}
+      >
         <div
-          style={{ width: `${officerPct}%`, background: "var(--forest)", transition: "width 0.3s" }}
-          title={`AICTE Officer ${officerDays}d`}
+          role="progressbar"
+          aria-label={`AICTE Council Review Time: ${officerDays} days (${officerPct}%)`}
+          aria-valuenow={officerPct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          style={{
+            width: `${officerPct}%`,
+            background: "#0B1220",
+            borderRadius: instPct === 0 ? 9999 : "9999px 0 0 9999px",
+            transition: "width 0.3s ease",
+            minWidth: officerDays > 0 ? "4px" : "0px",
+          }}
+          title={`AICTE Council Review: ${officerDays}d (${officerPct}%)`}
         />
         <div
-          style={{ width: `${100 - officerPct}%`, background: "#D97706", transition: "width 0.3s" }}
-          title={`Institution ${institutionDays}d`}
+          role="progressbar"
+          aria-label={`Institution Deficiency Response Time: ${institutionDays} days (${instPct}%)`}
+          aria-valuenow={instPct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          style={{
+            width: `${instPct}%`,
+            background: "var(--aiclear-teal)",
+            borderRadius: officerPct === 0 ? 9999 : "0 9999px 9999px 0",
+            transition: "width 0.3s ease",
+            minWidth: institutionDays > 0 ? "4px" : "0px",
+          }}
+          title={`Institution Response: ${institutionDays}d (${instPct}%)`}
         />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 12.5 }}>
-        <span style={{ color: "var(--forest)", fontWeight: 700 }}>
-          AICTE Officer Review: {officerDays}d ({officerPct}%)
-        </span>
-        <span style={{ color: "var(--amber)", fontWeight: 700 }}>
-          Institution Deficiency Response: {institutionDays}d ({100 - officerPct}%)
-        </span>
+
+      {/* Structured Legend with Badges & Text */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: 12,
+          gap: 12,
+          flexWrap: "wrap",
+          fontSize: 12.5,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              background: "#0B1220",
+              display: "inline-block",
+              flexShrink: 0,
+            }}
+            aria-hidden="true"
+          />
+          <span style={{ color: "var(--aiclear-text-primary)", fontWeight: 700 }}>
+            Council Review Time:
+          </span>
+          <span className="font-mono" style={{ color: "#0B1220", fontWeight: 800 }}>
+            {officerDays}d ({officerPct}%)
+          </span>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              background: "var(--aiclear-teal)",
+              display: "inline-block",
+              flexShrink: 0,
+            }}
+            aria-hidden="true"
+          />
+          <span style={{ color: "var(--aiclear-text-primary)", fontWeight: 700 }}>
+            Institution Response Time:
+          </span>
+          <span className="font-mono" style={{ color: "var(--aiclear-teal)", fontWeight: 800 }}>
+            {institutionDays}d ({instPct}%)
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -465,7 +555,7 @@ export default async function ApplicationDetailPage({
         <div className="card-header">
           <span className="card-title">Deadlines</span>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrap">
           <table className="data-table">
             <thead>
               <tr>

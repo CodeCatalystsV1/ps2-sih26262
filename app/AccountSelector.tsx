@@ -10,13 +10,13 @@ type UserOption = {
   scope: string;
 };
 
-const ROLE_META: Record<string, { label: string; bg: string }> = {
-  INSTITUTION: { label: "Institution", bg: "var(--accent-sage)" },
-  REGIONAL_OFFICER: { label: "Regional", bg: "var(--highlighter-yellow)" },
-  BUREAU_OFFICER: { label: "Bureau", bg: "var(--accent-blue)" },
-  EVC_COMMITTEE: { label: "EVC", bg: "#FEF3C7" },
-  SAC_SHC_MEMBER: { label: "SAC/SHC", bg: "#E4EAFE" },
-  ADMIN: { label: "Admin", bg: "var(--accent-peach)" },
+const ROLE_META: Record<string, { label: string; bg: string; color: string }> = {
+  INSTITUTION: { label: "Institution", bg: "#CCFBF1", color: "#0F766E" },
+  REGIONAL_OFFICER: { label: "Regional", bg: "#E0E7FF", color: "#3730A3" },
+  BUREAU_OFFICER: { label: "Bureau", bg: "#DBEAFE", color: "#1E40AF" },
+  EVC_COMMITTEE: { label: "EVC", bg: "#FEF3C7", color: "#92400E" },
+  SAC_SHC_MEMBER: { label: "SAC/SHC", bg: "#EDE9FE", color: "#5B21B6" },
+  ADMIN: { label: "Admin", bg: "#F1F5F9", color: "#334155" },
 };
 
 export function AccountSelector({
@@ -37,9 +37,18 @@ export function AccountSelector({
         setOpen(false);
       }
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && open) {
+        setOpen(false);
+      }
+    }
     document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, []);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
 
   const selected = users.find((u) => u.id === selectedId) ?? users[0];
   const filteredUsers =
@@ -53,6 +62,9 @@ export function AccountSelector({
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
+            aria-label="Switch active demo persona"
+            aria-expanded={open}
+            aria-haspopup="listbox"
             style={{
               width: "100%",
               display: "flex",
@@ -61,11 +73,11 @@ export function AccountSelector({
               gap: 12,
               padding: "11px 18px",
               borderRadius: 9999,
-              border: open ? "1.5px solid var(--forest)" : "1.5px solid var(--border)",
+              border: open ? "1.5px solid var(--aiclear-indigo)" : "1.5px solid var(--border)",
               background: "#FFFFFF",
               cursor: "pointer",
               textAlign: "left",
-              boxShadow: open ? "0 0 0 3px rgba(20, 40, 29, 0.08)" : "none",
+              boxShadow: open ? "0 0 0 3px rgba(49, 95, 232, 0.12)" : "none",
             }}
           >
             {selected ? (
@@ -76,26 +88,26 @@ export function AccountSelector({
                     fontSize: 10.5,
                     fontWeight: 700,
                     background: ROLE_META[selected.role]?.bg ?? "var(--bg-subtle)",
-                    color: "var(--forest)",
+                    color: ROLE_META[selected.role]?.color ?? "var(--aiclear-text-primary)",
                     padding: "2px 9px",
                     borderRadius: 9999,
-                    border: "1px solid var(--forest)",
+                    border: "1px solid rgba(0,0,0,0.08)",
                     flexShrink: 0,
                   }}
                 >
                   {ROLE_META[selected.role]?.label ?? selected.role}
                 </span>
-                <span style={{ fontWeight: 700, fontSize: 13.5, color: "var(--forest)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <span style={{ fontWeight: 700, fontSize: 13.5, color: "var(--aiclear-text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {selected.name}
                 </span>
-                <span style={{ fontSize: 12, color: "var(--forest-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <span style={{ fontSize: 12, color: "var(--aiclear-text-secondary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   · {selected.scope}
                 </span>
               </div>
             ) : (
               <span>Select user...</span>
             )}
-            <span className="font-mono" style={{ fontSize: 11.5, fontWeight: 700, color: "var(--forest-muted)" }}>
+            <span className="font-mono" style={{ fontSize: 11.5, fontWeight: 700, color: "var(--aiclear-text-secondary)" }}>
               {open ? "Close" : "Change"}
             </span>
           </button>

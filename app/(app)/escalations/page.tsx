@@ -5,6 +5,8 @@ import { differenceInCalendarDays } from "date-fns";
 import { getNow } from "@/lib/clock";
 import { formatDeadlineKind } from "@/lib/format";
 import Link from "next/link";
+import { CheckCircle2 } from "lucide-react";
+import { EmptyState } from "@/app/components/shared/EmptyState";
 import { ResolveEscalationButton } from "./ResolveEscalationButton";
 
 export default async function EscalationsPage({
@@ -70,7 +72,7 @@ export default async function EscalationsPage({
           <span className="card-title">Escalated Deadlines</span>
           <span className="badge badge-purple">{items.length}</span>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrap">
           <table className="data-table">
             <thead>
               <tr>
@@ -116,11 +118,11 @@ export default async function EscalationsPage({
                     <td>
                       <div style={{ display: "flex", gap: 6 }}>
                         {item.applicationId ? (
-                          <Link href={`/applications/${item.applicationId}`} className="btn btn-primary btn-sm">
+                          <Link href={`/applications/${item.applicationId}`} className="btn btn-primary btn-sm" aria-label={`Open application for ${item.title}`}>
                             Open
                           </Link>
                         ) : (
-                          <Link href="/undertakings" className="btn btn-secondary btn-sm">
+                          <Link href="/undertakings" className="btn btn-secondary btn-sm" aria-label={`View undertakings for ${item.title}`}>
                             View
                           </Link>
                         )}
@@ -133,10 +135,15 @@ export default async function EscalationsPage({
               {items.length === 0 && (
                 <tr>
                   <td colSpan={7}>
-                    <div className="empty-state">
-                      <h3>No Open Escalations</h3>
-                      <p>All items are within SLA.</p>
-                    </div>
+                    <EmptyState
+                      icon={CheckCircle2}
+                      title={showResolved ? "No Resolved Escalations" : "All Caught Up"}
+                      description={
+                        showResolved
+                          ? "No resolved escalation records are currently logged."
+                          : "There are no open regulatory escalations in this queue. All items are progressing within SLA."
+                      }
+                    />
                   </td>
                 </tr>
               )}

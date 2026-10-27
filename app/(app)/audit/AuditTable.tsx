@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { formatAction, formatEntityType, formatRole } from "@/lib/format";
+import { EmptyState } from "@/app/components/shared/EmptyState";
+import { History } from "lucide-react";
 
 type LogEntry = {
   seq: number;
@@ -93,6 +95,7 @@ export function AuditTable({
           type="text"
           className="form-input"
           placeholder="Filter by action, role, or entity..."
+          aria-label="Filter audit logs by action, role, or entity"
           value={filterAction}
           onChange={(e) => setFilterAction(e.target.value)}
           style={{ minWidth: 260, flex: 1, maxWidth: 360 }}
@@ -168,7 +171,7 @@ export function AuditTable({
       )}
 
       <div className="card">
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrap">
           <table className="data-table">
             <thead>
               <tr>
@@ -192,7 +195,7 @@ export function AuditTable({
                 return (
                   <tr key={log.seq}>
                     <td className="font-mono"><strong>#{log.seq}</strong></td>
-                    <td style={{ fontSize: 12, color: "var(--forest-muted)", whiteSpace: "nowrap" }}>
+                    <td style={{ fontSize: 12, color: "var(--aiclear-text-secondary)", whiteSpace: "nowrap" }}>
                       {new Date(log.ts).toLocaleString()}
                     </td>
                     <td>
@@ -205,7 +208,7 @@ export function AuditTable({
                     <td><span className="badge badge-amber">{formatAction(log.action)}</span></td>
                     <td>
                       <span style={{ fontWeight: 600 }}>{formatEntityType(log.entityType)}</span>{" "}
-                      <small className="font-mono" style={{ color: "var(--forest-muted)" }}>
+                      <small className="font-mono" style={{ color: "var(--aiclear-text-secondary)" }}>
                         ({log.entityId.slice(0, 8)})
                       </small>
                     </td>
@@ -226,6 +229,7 @@ export function AuditTable({
                       <button
                         className="btn btn-secondary btn-sm"
                         onClick={() => setExpandedSeq(isExpanded ? null : log.seq)}
+                        aria-label={`${isExpanded ? "Hide" : "Inspect"} payload for sequence #${log.seq}`}
                       >
                         {isExpanded ? "Hide" : "Inspect"}
                       </button>
@@ -234,8 +238,9 @@ export function AuditTable({
                           style={{
                             marginTop: 8,
                             padding: 10,
-                            background: "var(--forest)",
-                            color: "var(--highlighter-yellow)",
+                            background: "var(--aiclear-navy)",
+                            color: "#38BDF8",
+                            border: "1px solid rgba(255,255,255,0.1)",
                             borderRadius: 10,
                             fontSize: 11,
                             overflowX: "auto",
@@ -252,7 +257,11 @@ export function AuditTable({
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={7}>
-                    <div className="empty-state"><p>No audit records found.</p></div>
+                    <EmptyState
+                      icon={History}
+                      title="No audit records"
+                      description={filterAction ? "No audit records match your filter criteria." : "No SHA-256 audit ledger records currently available."}
+                    />
                   </td>
                 </tr>
               )}

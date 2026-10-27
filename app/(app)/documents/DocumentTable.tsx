@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { differenceInCalendarDays } from "date-fns";
 import { formatDocType } from "@/lib/format";
 import Link from "next/link";
+import { FolderOpen } from "lucide-react";
+import { EmptyState } from "@/app/components/shared/EmptyState";
 
 type DocItem = {
   id: string;
@@ -114,6 +116,17 @@ export function DocumentTable({
     }
   }
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        if (verifyTarget) setVerifyTarget(null);
+        if (activeRenewId) setActiveRenewId(null);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [verifyTarget, activeRenewId]);
+
   return (
     <div>
       {errorMsg && (
@@ -123,13 +136,23 @@ export function DocumentTable({
       )}
       {verifyTarget && (
         <div className="modal-overlay" onClick={() => !loading && setVerifyTarget(null)}>
-          <form onSubmit={handleVerify} className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-title">
+          <form
+            onSubmit={handleVerify}
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="doc-verify-modal-title"
+          >
+            <div className="modal-title" id="doc-verify-modal-title">
               {verifyTarget.verified ? "Verify Document Renewal" : "Reject Document Renewal"}
             </div>
             <div className="form-group">
-              <label className="form-label">Remarks {verifyTarget.verified ? "(optional)" : "*"}</label>
+              <label htmlFor="doc-verify-remarks-input" className="form-label">
+                Remarks {verifyTarget.verified ? "(optional)" : "*"}
+              </label>
               <textarea
+                id="doc-verify-remarks-input"
                 className="form-input"
                 rows={3}
                 value={verifyRemarks}
@@ -161,11 +184,19 @@ export function DocumentTable({
       {/* Upload Renewal Modal */}
       {activeRenewId && (
         <div className="modal-overlay" onClick={() => setActiveRenewId(null)}>
-          <form onSubmit={handleRenew} className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-title">Submit Renewal</div>
+          <form
+            onSubmit={handleRenew}
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="doc-renew-modal-title"
+          >
+            <div className="modal-title" id="doc-renew-modal-title">Submit Renewal</div>
             <div className="form-group">
-              <label className="form-label">New Expiry Date *</label>
+              <label htmlFor="doc-new-valid-until" className="form-label">New Expiry Date *</label>
               <input
+                id="doc-new-valid-until"
                 type="date"
                 className="form-input"
                 value={newValidUntil}
@@ -174,8 +205,9 @@ export function DocumentTable({
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Attach Renewal Document (.pdf) *</label>
+              <label htmlFor="doc-renewal-file-input" className="form-label">Attach Renewal Document (.pdf) *</label>
               <input
+                id="doc-renewal-file-input"
                 type="file"
                 accept=".pdf,application/pdf"
                 className="form-input"
@@ -197,7 +229,7 @@ export function DocumentTable({
                   }
                 }}
               />
-              <small style={{ color: "var(--forest-muted)", fontSize: 12 }}>
+              <small style={{ color: "var(--aiclear-text-secondary)", fontSize: 12 }}>
                 Selected: <strong>{renewalFileName || "none"}</strong>
                 {renewalSize > 0 ? ` · ${renewalSize.toLocaleString()} bytes` : ""}
               </small>
@@ -235,7 +267,7 @@ export function DocumentTable({
       </div>
 
       <div className="card">
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrap">
           <table className="data-table">
             <thead>
               <tr>
@@ -293,7 +325,7 @@ export function DocumentTable({
                           {doc.evidence.fileName}
                         </Link>
                       ) : "—"}
-                      {doc.remarks && <div style={{ marginTop: 4, color: "var(--forest-muted)" }}>{doc.remarks}</div>}
+                      {doc.remarks && <div style={{ marginTop: 4, color: "var(--aiclear-text-secondary)" }}>{doc.remarks}</div>}
                     </td>
                     <td>
                       <div style={{ display: "flex", gap: 6 }}>
@@ -345,7 +377,11 @@ export function DocumentTable({
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={8}>
-                    <div className="empty-state"><p>No documents found.</p></div>
+                    <EmptyState
+                      icon={FolderOpen}
+                      title="No Documents Found"
+                      description="No registered statutory documents match the selected validity filter."
+                    />
                   </td>
                 </tr>
               )}

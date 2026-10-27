@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { differenceInCalendarDays } from "date-fns";
 import { getNow } from "@/lib/clock";
 import Link from "next/link";
+import { EmptyState } from "@/app/components/shared/EmptyState";
+import { Users, CalendarCheck, ClipboardCheck } from "lucide-react";
 
 export default async function EvcPage() {
   const user = await getCurrentUser();
@@ -95,7 +97,7 @@ export default async function EvcPage() {
             <span className="card-title">Awaiting Scheduling</span>
             <span className="badge badge-blue">{queued.length}</span>
           </div>
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-wrap">
             <table className="data-table">
               <thead>
                 <tr>
@@ -148,7 +150,11 @@ export default async function EvcPage() {
                 {queued.length === 0 && (
                   <tr>
                     <td colSpan={7}>
-                      <div className="empty-state"><p>No visits waiting in queue.</p></div>
+                      <EmptyState
+                        icon={Users}
+                        title="Queue clear"
+                        description="There are currently no visits awaiting inspection scheduling."
+                      />
                     </td>
                   </tr>
                 )}
@@ -164,7 +170,7 @@ export default async function EvcPage() {
           <span className="card-title">Scheduled Inspections</span>
           <span className="badge badge-amber">{scheduled.length}</span>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrap">
           <table className="data-table">
             <thead>
               <tr>
@@ -214,7 +220,11 @@ export default async function EvcPage() {
               {scheduled.length === 0 && (
                 <tr>
                   <td colSpan={6}>
-                    <div className="empty-state"><p>No scheduled inspections.</p></div>
+                    <EmptyState
+                      icon={CalendarCheck}
+                      title="No scheduled visits"
+                      description="No upcoming expert committee visits are currently scheduled."
+                    />
                   </td>
                 </tr>
               )}
@@ -229,7 +239,7 @@ export default async function EvcPage() {
           <span className="card-title">Completed Inspections</span>
           <span className="badge badge-green">{completed.length}</span>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrap">
           <table className="data-table">
             <thead>
               <tr>
@@ -258,6 +268,17 @@ export default async function EvcPage() {
                   </td>
                 </tr>
               ))}
+              {completed.length === 0 && (
+                <tr>
+                  <td colSpan={5}>
+                    <EmptyState
+                      icon={ClipboardCheck}
+                      title="No completed inspections"
+                      description="Completed inspection reports and verified visits will appear here."
+                    />
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

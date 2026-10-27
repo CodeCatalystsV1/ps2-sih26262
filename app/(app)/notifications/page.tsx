@@ -5,7 +5,8 @@ import { formatStatus } from "@/lib/format";
 import { getGatewayStatus } from "@/lib/notify";
 import { LiveAlertTester } from "./LiveAlertTester";
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Bell, Send } from "lucide-react";
+import { EmptyState } from "@/app/components/shared/EmptyState";
 
 export const dynamic = "force-dynamic";
 
@@ -130,10 +131,11 @@ export default async function NotificationsPage({
       {activeTab === "inbox" && (
         <div className="card">
           {inbox.length === 0 && (
-            <div className="empty-state">
-              <h3>No Notifications</h3>
-              <p>No alerts in your inbox.</p>
-            </div>
+            <EmptyState
+              icon={Bell}
+              title="Inbox is Clear"
+              description="You have no pending regulatory alerts, SLA reminders, or deficiency notices."
+            />
           )}
           <div style={{ display: "grid", gap: 10 }}>
             {inbox.map((notif) => (
@@ -193,7 +195,7 @@ export default async function NotificationsPage({
               <span className="card-title">Outbound Email &amp; SMS Dispatch Log</span>
               <span className="badge badge-blue">{deliveryLog.length}</span>
             </div>
-            <div style={{ overflowX: "auto" }}>
+            <div className="table-wrap">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -217,8 +219,8 @@ export default async function NotificationsPage({
                         <span className={`badge ${kindColors[n.kind] ?? "badge-gray"}`}>{formatStatus(n.kind)}</span>
                       </td>
                       <td>
-                        <div style={{ fontWeight: 700, fontSize: 13 }}>{n.toUser?.name ?? "System User"}</div>
-                        <div className="font-mono" style={{ fontSize: 11, color: "var(--forest-muted)" }}>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: "var(--aiclear-text-primary)" }}>{n.toUser?.name ?? "System User"}</div>
+                        <div className="font-mono" style={{ fontSize: 11, color: "var(--aiclear-text-secondary)" }}>
                           {n.toUser?.email ?? ""}
                         </div>
                       </td>
@@ -228,8 +230,8 @@ export default async function NotificationsPage({
                         </span>
                       </td>
                       <td style={{ maxWidth: 380 }}>
-                        <div style={{ fontWeight: 700, color: "var(--forest)" }}>{n.subject}</div>
-                        <div style={{ fontSize: 12, color: "var(--forest-muted)", marginTop: 2 }}>{n.body}</div>
+                        <div style={{ fontWeight: 700, color: "var(--aiclear-text-primary)" }}>{n.subject}</div>
+                        <div style={{ fontSize: 12, color: "var(--aiclear-text-secondary)", marginTop: 2 }}>{n.body}</div>
                         {n.previewUrl && (
                           <div style={{ marginTop: 6 }}>
                             <a
@@ -251,9 +253,12 @@ export default async function NotificationsPage({
                   {deliveryLog.length === 0 && (
                     <tr>
                       <td colSpan={6}>
-                        <div className="empty-state">
-                          <p>No outbound dispatches recorded.</p>
-                        </div>
+                        <EmptyState
+                          icon={Send}
+                          title="No Outbound Dispatches"
+                          description="Dispatched SMS alerts and official notification emails will be logged here."
+                          compact
+                        />
                       </td>
                     </tr>
                   )}

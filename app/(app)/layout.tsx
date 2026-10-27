@@ -140,8 +140,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               : "#334155";
 
   return (
-    <div data-role={user.role} className="min-h-screen bg-[#F1F5F9] text-[#0F172A]">
+    <div data-role={user.role} className="app-shell min-h-screen">
       <div className="role-accent-stripe" style={{ background: roleAccent }} />
+
+      {/* Decorative AICTE Logo Watermark Background (Behind Content, Pointer-Events None) */}
+      <div className="aicte-watermark" aria-hidden="true" />
 
       {/* Sidebar: Midnight Navy */}
       <aside className="sidebar">
@@ -152,13 +155,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 width: 32,
                 height: 32,
                 borderRadius: 9,
-                background: "#315FE8",
+                background: "#EA580C",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: "#FFFFFF",
                 flexShrink: 0,
-                boxShadow: "0 2px 8px rgba(49, 95, 232, 0.4)",
+                boxShadow: "0 2px 10px rgba(234, 88, 12, 0.4)",
               }}
             >
               <ShieldCheck size={18} strokeWidth={2.4} />
@@ -215,7 +218,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <header className="topbar">
         <SidebarToggle />
         <div className="topbar-title" id="page-title">
-          <Shield size={16} className="text-[#315FE8] shrink-0" />
+          <Shield size={16} className="text-[#EA580C] shrink-0" />
           <span>AIClear Regulatory Portal</span>
           <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 500 }}>· SIH26262</span>
         </div>
@@ -226,7 +229,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             className="clock-badge"
             title="System calendar override is active"
           >
-            <Calendar size={12} className="text-[#315FE8]" />
+            <Calendar size={12} className="text-[#EA580C]" />
             <span>
               {new Date(clock!.simulatedNow!).toLocaleDateString("en-IN", {
                 day: "numeric",
@@ -268,13 +271,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           className="safeguards-banner"
           style={{
             marginTop: 32,
-            padding: "12px 16px",
-            borderRadius: 12,
-            background: "#FFFFFF",
-            border: "1px solid #D8E0EC",
+            padding: "14px 18px",
+            borderRadius: 14,
             display: "flex",
             alignItems: "center",
-            gap: 10,
+            gap: 12,
             fontSize: 12,
             color: "#64748B",
           }}

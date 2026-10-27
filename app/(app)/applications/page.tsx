@@ -6,6 +6,8 @@ import { getNow } from "@/lib/clock";
 import { STAGES } from "@/config/rules";
 import { formatAppType, formatRoute, formatStage, formatStatus } from "@/lib/format";
 import Link from "next/link";
+import { FileText } from "lucide-react";
+import { EmptyState } from "@/app/components/shared/EmptyState";
 
 function SlaChip({ days, escalationLevel }: { days: number; escalationLevel?: number }) {
   if (escalationLevel && escalationLevel > 0) return <span className="sla-chip purple">Escalated L{escalationLevel}</span>;
@@ -152,7 +154,7 @@ export default async function ApplicationsPage({
       </form>
 
       <div className="card">
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrap">
           <table className="data-table">
             <thead>
               <tr>
@@ -164,7 +166,7 @@ export default async function ApplicationsPage({
                 <th>Assigned To</th>
                 <th>SLA</th>
                 <th>Status</th>
-                <th></th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -181,21 +183,21 @@ export default async function ApplicationsPage({
                       </Link>
                     </td>
                     <td>
-                      <div style={{ fontWeight: 700, color: "var(--forest)" }}>{app.institution.name}</div>
-                      <div style={{ fontSize: 11.5, color: "var(--forest-muted)" }}>{app.institution.type}</div>
+                      <div style={{ fontWeight: 700, color: "var(--aiclear-text-primary)" }}>{app.institution.name}</div>
+                      <div style={{ fontSize: 11.5, color: "var(--aiclear-text-secondary)" }}>{app.institution.type}</div>
                     </td>
                     <td>
                       <span className="badge badge-blue">{formatAppType(app.applicationType)}</span>
                     </td>
                     <td>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--forest-muted)" }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--aiclear-text-secondary)" }}>
                         {formatRoute(app.route)}
                       </span>
                     </td>
                     <td>
                       <span className="badge badge-gray">{stageMeta?.label ?? formatStage(app.currentStageKey)}</span>
                     </td>
-                    <td style={{ fontSize: 12.5, color: "var(--forest-muted)", fontWeight: 500 }}>
+                    <td style={{ fontSize: 12.5, color: "var(--aiclear-text-secondary)", fontWeight: 500 }}>
                       {app.assignedTo?.name ?? "Unassigned"}
                     </td>
                     <td>
@@ -215,7 +217,7 @@ export default async function ApplicationsPage({
                       </span>
                     </td>
                     <td>
-                      <Link href={`/applications/${app.id}`} className="btn btn-secondary btn-sm">
+                      <Link href={`/applications/${app.id}`} className="btn btn-secondary btn-sm" aria-label={`View dossier for ${app.refNo}`}>
                         View
                       </Link>
                     </td>
@@ -225,10 +227,12 @@ export default async function ApplicationsPage({
               {applications.length === 0 && (
                 <tr>
                   <td colSpan={9}>
-                    <div className="empty-state">
-                      <h3>No Applications Found</h3>
-                      <p>Adjust filters or submit a new application.</p>
-                    </div>
+                    <EmptyState
+                      icon={FileText}
+                      title="No Applications Found"
+                      description="No institutional files match the current filters or regulatory search criteria."
+                      action={{ label: "Reset filters", href: "/applications" }}
+                    />
                   </td>
                 </tr>
               )}

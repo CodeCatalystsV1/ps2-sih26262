@@ -1,4 +1,4 @@
-# AIClear — Approval Intelligence
+# APPROVIA
 ### Integrated AICTE Approval Workflow Automation, Compliance Monitoring and Alert Management System
 **Smart India Hackathon 2026 | Problem Statement ID: SIH26262**
 
@@ -376,7 +376,7 @@ aicte-flow/
 
 <div align="center">
 
-### AIClear — Approval Intelligence
+### APPROVIA
 **Rule-Driven · Evidence-Linked · Human-Authorized**
 
 *Developed for Smart India Hackathon 2026 | Problem Statement SIH26262*
